@@ -536,3 +536,48 @@ void DelKNode(pLinkList *pHead,int k)//删除单链表的倒数第k（k>1）个结点
 	slow->next = slow->next->next;
 	free(del);
 }
+
+pLinkNode JosephCycle(pLinkList* pHead,int num)//约瑟夫环
+{
+	pLinkNode cur = *pHead;
+	pLinkNode del = NULL;
+	int count = 0;
+	assert(pHead);
+	while (1)
+	{
+		count = num;
+		if(cur->next == cur)
+		{
+			break;
+		}
+		while (--count)
+		{
+			cur = cur->next;
+		}
+		printf("%d ",cur->data);
+		del = cur->next;
+		cur->data = cur->next->data;
+		cur->next = cur->next->next;
+		free(del);
+	}
+	*pHead = cur;
+	return cur;
+}
+
+//链表带环问题
+pLinkNode CheckCycle(pLinkList plist)//判断链表是否带环
+{
+	pLinkList fast = plist;
+	pLinkList slow = plist;
+	while (fast && fast->next)
+	{
+		slow = slow->next;
+		fast = fast->next;
+		if(fast == slow)
+		{
+			return slow;
+		}
+	}
+	return NULL;
+}
+
