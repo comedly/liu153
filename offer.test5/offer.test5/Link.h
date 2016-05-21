@@ -572,7 +572,7 @@ pLinkNode CheckCycle(pLinkList plist)//判断链表是否带环
 	while (fast && fast->next)
 	{
 		slow = slow->next;
-		fast = fast->next;
+		fast = fast->next->next;
 		if(fast == slow)
 		{
 			return slow;
@@ -581,3 +581,26 @@ pLinkNode CheckCycle(pLinkList plist)//判断链表是否带环
 	return NULL;
 }
 
+int GetCircleLength(pLinkNode meet)//若带环则求环的长度
+{
+	int count = 0;
+	pLinkNode pos = meet;
+	do
+	{
+		pos = pos->next;
+		count++;
+	}while (pos != meet);
+	return count;
+}
+
+pLinkNode GetCycleEntryNode(pLinkList plist,pLinkNode meetNode)//获取环的入口结点
+{
+	pLinkNode entry = plist;
+	pLinkNode meet = meetNode;
+	while (entry != meet)
+	{
+		entry = entry->next;
+		meet = meet->next;
+	}
+	return entry;
+}
