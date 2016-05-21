@@ -52,11 +52,34 @@ void Test3()
 	printf("%d\n",pos->data);
 }
 
+void Test4()
+{
+	pLinkList mylist;
+	pLinkNode pos = NULL;
+	pLinkNode cur = NULL;
+	int i = 0;
+	InitLinkList(&mylist);
+	for(i = 1;i <= 6;i++)//¹¹½¨»·
+	{
+		PushBack(&mylist,i);
+	}
+	cur = Find(&mylist,3);
+	pos = Find(&mylist,6);
+	pos->next = cur;
+	pos = CheckCycle(mylist);
+	printf("%d\n",pos->data);
+	i = GetCircleLength(pos);
+	printf("%d\n",i);
+	cur = GetCycleEntryNode(mylist,pos);
+	printf("%d\n",cur->data);
+}
+
 int main()
 {
 	//Test1();
 	//Test2();
-	Test3();
+	//Test3();
+	Test4();
 	system("pause");
 	return 0;
 }
