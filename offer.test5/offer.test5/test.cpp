@@ -36,10 +36,27 @@ void Test2()
 	HeadToTailPrintList(&mylist);
 }
 
+void Test3()
+{
+	pLinkList mylist;
+	pLinkNode pos = NULL;
+	int i = 0;
+	InitLinkList(&mylist);
+	for(i = 1;i <= 41;i++)//¹¹½¨»·
+	{
+		PushBack(&mylist,i);
+	}
+	pos = Find(&mylist,41);
+	pos->next = mylist;
+	pos = JosephCycle(&mylist,3);
+	printf("%d\n",pos->data);
+}
+
 int main()
 {
 	//Test1();
-	Test2();
+	//Test2();
+	Test3();
 	system("pause");
 	return 0;
 }
