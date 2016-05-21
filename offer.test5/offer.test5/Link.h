@@ -386,5 +386,153 @@ void ReverseList(pLinkList* pHead)//链表的逆序
 
 void BubbleSort(pLinkList* pHead)//冒泡排序
 {
+	pLinkNode cur = *pHead;
+	assert(pHead);
+	while (cur)
+	{
+		if(cur->next != NULL)
+		{
+			pLinkNode pos = cur->next;
+			while (pos)
+			{
+				if(cur->data > pos->data)
+				{
+					DataType temp = cur->data;
+					cur->data = pos->data;
+					pos->data = temp;
+				}
+				pos = pos->next;
+			}
+			cur = cur->next;
+		}
+		else
+		{
+			return;
+		}
+	}
+}
 
+void InsertFrontNode(pLinkNode pos,DataType x)//无头结点的情况下，再当前结点前插入一个数据
+{
+	pLinkNode NewNode = BuyNode(x);
+	DataType temp = 0;
+	assert(pos);
+	NewNode->next = pos->next;
+	pos->next = NewNode;
+	temp = pos->data;
+	pos->data = NewNode->data;
+	NewNode->data = temp;
+}
+
+pLinkNode Merge(pLinkList l1,pLinkList l2)//非递归法实现两个有序链表的合并
+{
+	pLinkNode newHead = NULL;
+	pLinkNode cur = NULL;
+	if(l1 == l2)
+	{
+		return l1;
+	}
+	if((l1 != NULL) && (l2 == NULL))
+	{
+		return l1;
+	}
+	if((l1 == NULL) && (l2 != NULL))
+	{
+		return l2;
+	}
+	if(l1->data < l2->data)
+	{
+		newHead = l1;
+		l1 = l1->next;
+	}
+	else
+	{
+		newHead = l2;
+		l2 = l2->next;
+	}
+	cur = newHead;
+	while ((l1) && (l2))
+	{
+		if(l1->data < l2->data)
+		{
+			cur->next = l1;
+			l1 = l1->next;
+		}
+		else
+		{
+			cur->next = l2;
+			l2 = l2->next;
+		}
+		cur = cur->next;
+	}
+	if(l1)
+	{
+		cur->next = l1;
+	}
+	else
+	{
+		cur->next = l2;
+	}
+}
+
+pLinkNode _Merge(pLinkList l1,pLinkList l2)//基于递归实现两个有序链表的合并
+{
+	pLinkNode newHead = NULL;
+	if((l1 == NULL) && (l2 == NULL))
+	{
+		return NULL;
+	}
+	else if((l1 != NULL) && (l2 == NULL))
+	{
+		return l1;
+	}
+	else if((l1 == NULL) && (l2 != NULL))
+	{
+		return l2;
+	}
+	if(l1->data < l2->data)
+	{
+		newHead = l1;
+		newHead->next = _Merge(l1->next,l2);
+	}
+	else
+	{
+		newHead = l2;
+		newHead->next = _Merge(l1,l2->next);
+	}
+	return newHead;
+}
+
+pLinkNode FindMidNode(pLinkList* pHead)//查找链表的中间结点
+{
+	pLinkNode fast = *pHead;
+	pLinkNode slow = *pHead;
+	while(fast && fast->next)
+	{
+		fast = fast->next->next;
+		slow = slow->next;
+	}
+	return slow;
+}
+
+void DelKNode(pLinkList *pHead,int k)//删除单链表的倒数第k（k>1）个结点
+{
+	pLinkNode fast = *pHead;
+	pLinkNode slow = *pHead;
+	pLinkNode del = NULL;
+	assert(pHead);
+	assert(k>1);
+	while (--k)
+	{
+		fast = fast->next;
+	}
+	while (fast->next)
+	{
+		fast = fast->next;
+		slow = slow->next;
+	}
+	del = slow->next;
+	slow->data = slow->next->data;
+	slow->next = slow->next->next;
+	free(del);
 }
