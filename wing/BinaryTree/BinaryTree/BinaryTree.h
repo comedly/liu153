@@ -104,6 +104,50 @@ public:
 		return _LeafSize(_root);
 	}
 
+	bool HasSubTree(Node* root)//判断root是否是_root的子树
+	{
+		bool result = false;
+		if(_root != NULL && root != NULL)
+		{
+			if(_root->_data == root->_data)
+			{
+				result = DoseTree1HaveTree2(_root,root);
+			}
+			if(!result)
+			{
+				result = HasSubTree(_root->_left,root);
+			}
+			if(!result)
+			{
+				result = HasSubTree(_root->_right,root);
+			}
+		}
+		return result;
+	}
+
+	void MirrorRecursively()//二叉树的镜像
+	{
+		_MirrorRecursively(_root);
+	}
+
+	Node* Find(const T& x)//查找
+	{
+		return _Find(_root ,x);
+	}
+
+	size_t GetKLevel1(size_t k)//第k层结点的个数
+	{
+		return _GetKLevel1(_root,k);
+	}
+
+	size_t GetKLevel2(size_t k)//第k层结点的个数
+	{
+		size_t size = 0;
+		size_t level = 1;
+		_GetKLevel2(_root,level,k,size);
+		return size;
+	}
+
 protected:
 	Node* _CreateTree(const T* a,size_t size,const T& invalid,size_t& index)//创建二叉树
 	{
@@ -286,7 +330,81 @@ protected:
 
 	size_t _Depth(Node* root)//求树的深度
 	{
+		if(root == NULL)
+			return 0;
+		size_t leftsize = _Depth(root->_left);
+		size_t rightsize = _Depth(root->_right);
+		return leftsize > rightsize?(leftsize+1):(rightsize+1);
+	}
 
+	size_t _LeafSize(Node* root)//叶子节点个数
+	{
+		if(root == NULL)
+			return 0;
+		if(root->_left == NULL && root->_right == NULL)
+			return 1;
+		return _LeafSize(root->_left) + _LeafSize(root->_right);
+	}
+
+	bool DoseTree1HaveTree2(Node* root)//判断在tree1中是否有以tree2为根节点的左右子树
+	{
+		if(root == NULL)
+			return true;
+		if(_root == NULL)
+			return false;
+		if(_root->_data != root->_data)
+		{
+			return false;
+		}
+		return DoseTree1HaveTree2(_root->_left,root->_left) && DoseTree1HaveTree2(_root->_right,root->_right);
+	}
+
+	void _MirrorRecursively(Node* root)//二叉树的镜像
+	{
+		//判断根节点及左右子树是否为空
+		if(root == NULL || (root->_left == NULL && root->_right == NULL))
+			return;
+		Node* temp = root->_left;
+		root->_left = root->_right;
+		root->_right = temp;
+		if(root->_left != NULL)
+			_MirrorRecursively(root->_left);
+		if(root->_right != NULL)
+			_MirrorRecursively(root->_right);
+	}
+
+	Node* _Find(Node* root,const T& x)//查找
+	{
+		if(root == NULL)
+			return NULL;
+		if(root->_data == x)
+			return root;
+		Node* ret = _Find(root->_left,x);
+		if(ret)
+			return ret;
+		return _Find(root->_right,x);
+	}
+
+	size_t _GetKLevel1(Node* root,size_t k)
+	{
+		if(root == NULL)
+			return 0;
+		if(k == 1)
+			return 1;
+		return _GetKLevel1(root->_left,k-1) + _GetKLevel1(root->_right,k-1);
+	}
+
+	void _GetKLevel2(Node* root,size_t level,size_t k,size_t& size)
+	{
+		if(root == NULL)
+			return ;
+		if(k == level)
+		{
+			++size;
+			return;
+		}
+		_GetKLevel2(root->_left,level+1,k,size);
+		_GetKLevel2(root->_right,level+1,k,size);
 	}
 
 protected:
