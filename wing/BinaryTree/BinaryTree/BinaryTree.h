@@ -74,6 +74,36 @@ public:
 		_NonInOrder(_root);
 	}
 
+	void PosOrder()//后序遍历打印二叉树
+	{
+		cout<<"后序遍历(递归)：";
+		_PosOrder(_root);
+		cout<<endl;
+		_NonPosOrder(_root);
+	}
+
+	void LevelOrder()//层次遍历
+	{
+		cout<<"层次遍历：";
+		_LevelOrder(_root);
+		cout<<endl;
+	}
+
+	size_t Size()//求结点的个数
+	{
+		return _Size(_root);
+	}
+
+	size_t Depth()//求树的深度
+	{
+		return _Depth(_root);
+	}
+
+	size_t LeafSize()//叶子节点个数
+	{
+		return _LeafSize(_root);
+	}
+
 protected:
 	Node* _CreateTree(const T* a,size_t size,const T& invalid,size_t& index)//创建二叉树
 	{
@@ -181,21 +211,84 @@ protected:
 		cout<<endl;
 	}
 
+	void _PosOrder(Node* root)//后序遍历打印二叉树
+	{
+		if(root == NULL)
+		{
+			return;
+		}
+		_PosOrder(root->_left);
+		_PosOrder(root->_right);
+		cout<<root->_data<<" ";
+	}
+
+	void _NonPosOrder(Node* root)//非递归实现后序打印二叉树
+	{
+		Node* cur = root;
+		Node* prev = NULL;
+		stack<Node*> s;
+		if(root == NULL)
+			return;
+		cout<<"递归实现二叉树：";
+		while (cur || !s.empty())
+		{
+			while (cur)
+			{
+				s.push(cur);
+				cur = cur->_left;
+			}
+			cur = s.top();
+			if(cur->_right == NULL || cur->_right == prev)
+			{
+				
+				cout<<cur->_data<<" ";
+				s.pop();
+				prev = cur;
+				cur = NULL;
+			}
+			else
+			{
+				cur = cur->_right;
+			}
+		}
+		cout<<endl;
+	}
+
+	void _LevelOrder(Node* root)//层次遍历
+	{
+		queue<Node*> q;
+		if(root == NULL)
+		{
+			return;
+		}
+		q.push(root);
+		while (!q.empty())
+		{
+			if(q.front()->_left != NULL)
+			{
+				q.push(q.front()->_left);
+			}
+			if(q.front()->_right != NULL)
+			{
+				q.push(q.front()->_right);
+			}
+			cout<<q.front()->_data<<" ";
+			q.pop();
+		}
+	}
+
+	size_t _Size(Node* root)//求结点的个数
+	{
+		if(root == NULL)
+			return 0;
+		return _Size(root->_left) + _Size(root->_right) + 1;
+	}
+
+	size_t _Depth(Node* root)//求树的深度
+	{
+
+	}
+
 protected:
 	Node* _root;//根节点
 };
-
-void Test()
-{
-	int a1[10] = {1,2,3,'#','#',4,'#','#',5,6};
-	int a2[15] = {1,2,'#',3,'#','#',4,5,'#',6,'#',7,'#','#',8,};
-	int a3[5] = {2,3,'#','#',4};
-
-	BinaryTree<int> t1(a1,10,'#');
-	BinaryTree<int> t2(a1,15,'#');
-	BinaryTree<int> t3(a1,5,'#');
-
-	cout<<"t1遍历二叉树（前序、中序、后序）:"<<endl;
-	t1.PrevOrder();
-	t1.InOrder();
-}
