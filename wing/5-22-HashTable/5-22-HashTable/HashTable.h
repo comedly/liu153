@@ -384,6 +384,18 @@ namespace Second
 			return -1;
 		}
 
+		void FindKeyPrintToValue(int& ret)//根据key的值，查找value的值并打印
+		{
+			if(ret != -1)
+			{
+				cout<<_table[ret]._value<<endl;
+			}
+			else
+			{
+				return;
+			}
+		}
+
 		bool Remove(const K& key)
 		{
 			int index = Find(key);
@@ -437,7 +449,7 @@ namespace Second
 		}
 		
 	private:
-		K* _table;//哈希表
+		Node* _table;//哈希表
 		State* _state;//状态表
 		size_t _size;//哈希表中元素的个数
 		size_t _capacity;//哈希表的容量
