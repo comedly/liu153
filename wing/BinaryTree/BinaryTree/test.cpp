@@ -36,10 +36,20 @@ void Test2()
 	cout<<t1.GetKLevel2(3)<<endl;
 }
 
+void Test3()
+{
+	int prev[] = {1,2,3,4,5,6};
+	int in[] = {3,2,4,1,6,5};
+	BinaryTreeNode<int>* root = Construct(prev,in,6);
+	PrintTree(root);
+	cout<<endl;
+}
+
 int main()
 {
 	//Test1();
-	Test2();
+	//Test2();
+	Test3();
 	system("pause");
 	return 0;
 }
