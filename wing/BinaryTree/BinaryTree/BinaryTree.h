@@ -410,3 +410,70 @@ protected:
 protected:
 	Node* _root;//根节点
 };
+
+
+//根据遍历序列建立二叉树
+template<class K>
+BinaryTreeNode<K>* Construct(K* PreOrder,K* InOrder,int length)
+{
+	if(PreOrder == NULL || InOrder == NULL || length <=0)
+	{
+		return NULL;
+	}
+	return ConstructCore(PreOrder,PreOrder+length-1,InOrder,InOrder+length-1);
+}
+
+template<class K>
+BinaryTreeNode<K>* ConstructCore(K* StartPreOrder,K* EndPreOrder,K* StartInOrder,K* EndInOrder)
+{
+	//前序遍历序列的第一个数字为根节点的值
+	K rootNode = StartPreOrder[0];
+	BinaryTreeNode<K>* root = new BinaryTreeNode<K>(rootNode);
+	root->_left = root->_right = NULL;
+	if(StartPreOrder == EndPreOrder)
+	{
+		if(StartInOrder == EndInOrder && *StartPreOrder == *StartInOrder)
+		{
+			return root;
+		}
+		else
+		{
+			throw exception("invalid input.");
+		}
+	}
+	//在中序遍历中找到根节点
+	K* rootInOrder = StartInOrder;
+	while (rootInOrder <= EndInOrder && *rootInOrder != rootNode)
+	{
+		++rootInOrder;
+	}
+	if(rootInOrder == EndInOrder && *rootInOrder != rootNode)
+	{
+		throw exception("Invalid input.");
+	}
+	int leftLength = rootInOrder - StartInOrder;
+	K* leftPreOrderEnd = StartPreOrder + leftLength;
+	if(leftLength > 0)
+	{
+		//构建左子树
+		root->_left = ConstructCore(StartPreOrder + 1,leftPreOrderEnd,StartInOrder,rootInOrder-1);
+	}
+	if(leftLength < EndPreOrder - StartPreOrder)
+	{
+		//构建右子树
+		root->_right = ConstructCore(leftPreOrderEnd+1,EndPreOrder,rootInOrder+1,EndInOrder);
+	}
+	return root;
+}
+
+template<class K>
+void PrintTree(BinaryTreeNode<K>* root)
+{
+	if(root == NULL)
+	{
+		return;
+	}
+	cout<<root->_data<<"  ";
+	PrintTree(root->_left);
+	PrintTree(root->_right);
+}
