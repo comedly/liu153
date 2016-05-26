@@ -455,3 +455,249 @@ namespace Second
 		size_t _capacity;//哈希表的容量
 	};
 }
+
+namespace HashTableBucket
+{
+	template<class K,class V>
+	struct HashTableNode
+	{
+		K _key;
+		V _value;
+		HashTableNode* _next;//若哈希冲突,则挂在上一个位置的下面
+		HashTableNode()
+			:_next(NULL)
+		{ } 
+
+		HashTableNode(const K& key,const V& value)
+			:_key(key)
+			,_value(value)
+			,_next(NULL)
+		{ }
+	};
+
+	template<class K>
+	struct DefaultHashFunc
+	{
+		size_t operator()(const K& key)
+		{
+			return key;
+		}
+	};
+
+	template<>
+	struct DefaultHashFunc<string>
+	{
+		size_t operator()(const string& str)
+		{
+			size_t key = 0;
+			for(size_t i = 0;i < str.size();i++)
+			{
+				key += str[i];
+			}
+			return key;
+		}
+	};
+
+	template<class K,class V,class HashFunc = DefaultHashFunc<K>>
+	class HashTableBucket
+	{
+		typedef HashTableNode<K,V> Node;
+	public:
+		HashTableBucket()
+			:_table(NULL)
+			,_size(0)
+		{ }
+
+		HashTableBucket(const HashTableBucket<K,V,HashFunc>& ht)//拷贝构造
+		{
+			//将哈希表ht拷贝给this
+			this->_table.resize(ht._table.size());//开辟一块和哈希桶大小一样的空间
+			for(int i = 0;i < ht._table.size();i++)
+			{
+				Node* cur = ht._table[i];
+				while (cur)
+				{
+					Node* temp = new Node(cur->_key,cur->_value);
+					temp->_next = _table[i];
+					_table[i] = temp;
+					this->_size++;
+					cur = cur->_next;
+				}
+			}
+		}
+
+		//赋值语句的现代写法
+		HashTableBucket<K,V> operator=(HashTableBucket<K,V> ht)//此处就不能用const
+		{
+			if(this != &ht)
+			{
+				swap(_table,ht._table);
+				swap(_size,ht._size);
+			}
+			return *this;
+		}
+
+		~HashTableBucket()//析构函数
+		{
+			if(this->_table.size() != 0)
+			{
+				for(int i = 0;i < this->_table.size();i++)
+				{
+					Node* cur = _table[i];
+					while (cur != NULL)
+					{
+						Node* del = cur;
+						cur = cur->_next;
+						delete del;
+						del = NULL;
+					}
+				}
+			}
+			_size = 0;
+		}
+
+		bool Insert(const K& key,const V& value)
+		{
+			//检查容量
+			_CheckExpand();
+
+			size_t index = _HashFunc(key);
+			Node* cur = _table[index];
+			//防止冗余
+			while (cur)
+			{
+				if(key == cur->_key)
+				{
+					return false;
+				}
+				cur = cur->_next;
+			}
+			Node* NewNode = new Node(key,value);
+			NewNode->_next = _table[index];
+			_table[index] = NewNode;
+			_size++;
+			return true;
+		}
+
+		Node* Find(const K& key)//查找
+		{
+			size_t index = _HashFunc(key);
+			Node* cur = _table[index];
+			while (cur)
+			{
+				if(key == cur->_key)
+				{
+					return cur;
+				}
+				cur = cur->_next;
+			}
+			return NULL;
+		}
+
+		bool Remove(const K& key)//删除
+		{
+			size_t index = _HashFunc(key);
+			Node* cur = _table[index];
+			Node* prev = NULL;
+			while (cur)
+			{
+				if(cur->_key == key)
+					break;
+				prev = cur;
+				cur = cur->_next;
+			}
+			if(cur)
+			{
+				if(cur == _table[index])
+				{
+					_table[index] = cur->_next;
+				}
+				else
+				{
+					Node* next = cur->_next;
+					prev->_next = next;
+				}
+				delete cur;
+				cur = NULL;
+				--_size;
+				return true;
+			}
+			return false;
+		}
+
+		void PrintHashTable()
+		{
+			for(size_t i = 0;i < _table.size();i++)
+			{
+				Node* cur = _table[i];
+				while (cur)
+				{
+					cout<<i<<":{"<<cur->_key<<"->"<<cur->_value<<"}"<<endl;
+					cur = cur->_next;
+				}
+			}
+			cout<<endl;
+		}
+
+	protected:
+		size_t _HashFunc(const K& key)
+		{
+			//_table.size()表示哈希桶的空间大小，vector数组的大小
+			return HashFunc()(key) % _table.size();
+		}
+
+		size_t _GetNextPrime() // 得到下一个扩容的素数
+		{
+			static const size_t _PrimeSize = 28;
+			static const unsigned long _PrimeList [_PrimeSize] =
+			{
+				53ul,         97ul,         193ul,       389ul,       769ul,
+				1543ul,       3079ul,       6151ul,      12289ul,     24593ul,
+				49157ul,      98317ul,      196613ul,    393241ul,    786433ul,
+				1572869ul,    3145739ul,    6291469ul,   12582917ul,  25165843ul,
+				50331653ul,   100663319ul,  201326611ul, 402653189ul, 805306457ul,
+				1610612741ul, 3221225473ul, 4294967291ul
+			};
+			for (size_t i = 0; i < _PrimeSize; i++)
+			{
+				if (_PrimeList[i] > _size)
+				{
+					return _PrimeList[i];
+				}
+			}
+			return _PrimeList[_PrimeSize - 1];
+		}
+
+		void _CheckExpand()//扩容，容量都是素数
+		{
+			if(_size == _table.size())
+			{
+				size_t newSize = _GetNextPrime();
+				vector<Node*> newTables;
+				newTables.resize(newSize);
+
+				//将每个单链表上的元素摘下来 挂到新链上
+				for(size_t i = 0;i < _table.size();i++)
+				{
+					Node* cur = _table[i];
+					while (cur)
+					{
+						//摘结点
+						Node* temp = cur;
+						cur = cur->_next;
+						//挂结点
+						size_t index = _HashFunc(temp->_key);
+						temp->_next = newTables[index];
+						newTables[index] = temp;
+					}
+					_table[i] = NULL;
+				}
+				swap(_table,newTables);
+			}
+		}
+
+	protected:
+		vector<Node*> _table;
+		size_t _size;//数据个数
+	};
+}
