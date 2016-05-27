@@ -96,3 +96,48 @@ protected:
 	size_t _top;//实际存储元素的个数
 	size_t _capacity;//容量
 };
+
+
+//用两个栈实现一个队列
+template<class T>
+class Cqueue
+{
+public:
+	Cqueue()
+	{ }
+
+	~Cqueue()
+	{ }
+
+	void AppendTail(const T& x)
+	{
+		//stack1只需要直接压人
+		stack1.Push(x);
+	}
+
+	T DeleteHead()
+	{
+		if(stack2.Size() <= 0)//stack2为空
+		{
+			//依次将栈1中的元素弹出并压人stack2，此时位于stack2栈顶上的元素为头结点，若要删除，直接pop就可以了，此时如果还需要压人元素直接压人stack1即可，位于stack2栈顶的元素仍然为头结点，若此时stack2空了，则需要将stack1的元素弹出并压人stack2中，删除只需pop掉stack2的栈顶元素即可
+			while (stack1.Size() > 0)
+			{
+				T& data = stack1.Top();
+				stack1.Pop();
+				stack2.Push(data);
+			}
+		}
+		if(stack2.Size() == 0)
+		{
+			throw new exception("queue isempty!");
+		}
+		T head = stack2.Top();
+		cout<<"删除头结点："<<head<<endl;
+		stack2.Pop();
+		return head;//返回删除的头结点
+	}
+
+protected:
+	Stack<T> stack1;
+	Stack<T> stack2;
+};
