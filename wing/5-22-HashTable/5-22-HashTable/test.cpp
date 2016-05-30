@@ -1,4 +1,6 @@
 #include"HashTable.h"
+#include"BitMap.h"
+#include"BloomFilter.h"
 
 void TestHash1()
 {
@@ -99,13 +101,16 @@ void TestHashTableBucket2()
 	HashTableBucket::HashTableBucket<int,string> ht3 = ht1;
 	ht3.PrintHashTable();
 }
+
 int main()
 {
 	//TestHash1();
 	//TestHash2();
 	//TestDict();
 	//TestHashTableBucket1();
-	TestHashTableBucket2();
+	//TestHashTableBucket2();
+	//TestBitMap();
+	TestBloomFilter();
 	system("pause");
 	return 0;
 }
