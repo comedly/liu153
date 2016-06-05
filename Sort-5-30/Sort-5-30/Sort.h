@@ -1,6 +1,7 @@
 #pragma once
 #include<iostream>
 #include<assert.h>
+#include<stack>
 using namespace std;
 
 
@@ -166,36 +167,206 @@ void TestBubbleSort()
 }
 
 //快速排序
-void QuickSort(int* a,int left,int right)
+//方法1：
+//选定一个key值，一般选头元素（或者尾元素）这里选定最后一个，设置两个指针一个指向第一个，另一个指向倒数第二个，从前向后选比key大的，从后向前选比key小的，进行交换。
+
+int PartSort(int* a,int left,int right)
 {
-	int low = left;
-	int high = right;
-	int key = a[low];
-	while (low < high)
+	assert(a);
+	int key = a[right];//设置key值为最后一个元素
+	int begin = left;
+	int end = right - 1;
+	while (begin < end)
 	{
-		while (low < high && key <= a[high])
+		while (begin < end && a[begin] <= key)//查找比key大的元素
 		{
-			--high;
+			++begin;
 		}
-		a[low] = a[high];
-		while (low < high && key >= a[low])
+		while (begin < end && a[end] >= key)//查找比key小的元素
 		{
-			++low;
+			--end;
 		}
-		a[high] = a[low];
+		if(begin < end)
+		{
+			swap(a[begin],a[end]);
+		}
 	}
-	a[low] = key;
-	if(left <= right)
+	if(a[begin] > a[right])//只有两个元素
 	{
-		QuickSort(a,left,low-1);
-		QuickSort(a,low+1,right);
+		swap(a[begin],a[right]);
+		return begin;
+	}
+	else
+	{
+		return right;
+	}
+	return begin;
+}
+
+//方法2：挖坑法
+//将右边的元素用key保存起来，此时最后一个位置上相当于一个坑，将左指针找到的比key大的数据保存到之前key的位置上，此时左指针指向的位置相当于一个坑，再将右指针找到的比key小的数据放到坑中，右指针指向的位置相当于一个坑，以此类推，当两指针相遇时，将key值赋到坑中，这时左边的数据都小于key值，右边的数据都大于key。
+
+//若选取数组中最大或者最小的元素作为key值，这时快速排序的最坏情况，利用三数取中法，能有效的解决这种问题，取数组中头元素、尾元素、和中间元素的最中间大小的数据作为key值，就能够避免这种情况
+
+int GetMidIndex(int* a,int left,int right)
+{
+	assert(a);
+	int mid = (left + right)/2;
+	if(a[left] < a[right])
+	{
+		if(a[mid] < a[left])
+		{
+			return left;
+		}
+		else if(a[mid] > a[right])
+		{
+			return right;
+		}
+		else
+		{
+			return mid;
+		}
+	}
+	else
+	{
+		if(a[mid] < a[right])
+		{
+			return right;
+		}
+		else if(a[mid] > a[left])
+		{
+			return left;
+		}
+		else
+		{
+			return mid;
+		}
+	}
+}
+
+//挖坑法
+int PartSort1(int* a,int left,int right)
+{
+	int index = GetMidIndex(a,left,right);
+	swap(a[index],a[right]);//将中间的数据与最右边的数据进行交换，将最右边的数据赋值给key。
+	int key = a[right];
+	int begin = left;
+	int end = right;
+	while (begin < end)
+	{
+		while (begin < end && a[begin] <= key)
+		{
+			++begin;
+		}
+		a[end] = a[begin];
+		while (begin < end && a[end] >= key)
+		{
+			--end;
+		}
+		a[begin] = a[end];
+	}
+	if(begin == end)
+	{
+		a[end] = key;
+		return begin;
+	}
+}
+
+//方法3：
+//选定最右边的元素为key，将cur指针指向数组的头元素，cur查找较key小的元素，prev指针指向cur-1的位置，当cur找到较小的元素，先进行prev++，若此时cur==prev，cur继续查找较key值小的元素，直到cur！=prev交换a[prev]和a[cur],直到cur指向数组的倒数第二个元素，这时将key与a[++prev]交换。
+
+int PartSort2(int* a,int left,int right)
+{
+	assert(a);
+	int key = a[right];
+	int cur = left;
+	int prev = left - 1;
+	while (cur < right)
+	{
+		if(a[cur] < key && ++prev != cur)
+		{
+			swap(a[cur],a[prev]);
+		}
+		++cur;
+	}
+	swap(a[right],a[++prev]);
+	return prev;
+}
+
+void QuickSort1(int* a,int left,int right)
+{
+	assert(a);
+	if(left >= right)
+	{
+		return ;
+	}
+	//int div = PartSort(a,left,right);
+	//int div = PartSort1(a,left,right);
+	int div = PartSort2(a,left,right);
+	QuickSort1(a,left,div-1);
+	QuickSort1(a,div+1,right);
+}
+
+//优化。
+//当区间<13,采用插入排序效率会高于快排，能减少程序压栈的开销
+void QuickSort2(int* a,int left,int right)
+{
+	assert(a);
+	if(left > right)
+		return;
+	int gap = right - left + 1;
+	if(gap < 13)
+	{
+		InsertSort(a,gap);
+	}
+	int ret = PartSort1(a,left,right);
+	QuickSort2(a,left,ret - 1);
+	QuickSort2(a,ret + 1,right);
+}
+
+//利用栈实现非递归快速排序
+void QuickSort_NonR(int* a,int left,int right)
+{
+	assert(a);
+	stack<int> s;
+	if(left < right)//当left < right时证明需要排序的数据个数大于1
+	{
+		s.push(left);
+		s.push(right);
+	}
+	while (!s.empty())
+	{
+		int end = s.top();
+		s.pop();
+		int begin = s.top();
+		s.pop();
+		if(end - begin < 13)
+		{
+			InsertSort(a,begin - end + 1);
+		}
+		else
+		{
+			int div = PartSort1(a,begin,end);
+			if(begin < div - 1)
+			{
+				s.push(begin);
+				s.push(div - 1);	
+			}
+			if(div + 1 < end)
+			{
+				s.push(div + 1);
+				s.push(end);
+			}
+		}
 	}
 }
 
 void TestQuickSort()
 {
-	int a[] = {2,5,1,4,7,8,0,3,6,9};
+	int a[] = {2,9,1,4,7,8,0,3,6,5,45,12,32,17};
 	int size = sizeof(a)/sizeof(a[0]);
-	QuickSort(a,0,9);
+	//QuickSort1(a,0,9);
+	//QuickSort2(a,0,9);
+	QuickSort_NonR(a,0,size - 1);
 	Print(a,size);
 }
