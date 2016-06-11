@@ -370,3 +370,187 @@ void TestQuickSort()
 	QuickSort_NonR(a,0,size - 1);
 	Print(a,size);
 }
+
+//归并排序
+//主要思想：与合并两个有序数组算法相似，需要借助一块O(N)的空间，将一个数组的元素分为两部分，若这两个部分都能够有序，则利用合并的思想进行合并，过程利用递归。
+
+void _Merge(int* a,int* temp,int begin1,int end1,int begin2,int end2)
+{
+	int index = begin1;   //用来标记temp数组的下标
+	while (begin1 <= end1 && begin2 <= end2)
+		//先判断begin1和begin2的大小，然后将小的数据从begin到end拷贝到temp上
+		//出循环的条件begin1 >= end1 || begin2 >= end2
+	{
+		if(a[begin1] < a[begin2])
+		{
+			temp[index++] = a[begin1++];
+		}
+		else
+		{
+			temp[index++] = a[begin2++];
+		}
+	}
+	//将剩下的begin1或者begin2再进行拷贝
+	while (begin1 <= end1)
+	{
+		temp[index++] = a[begin1++];
+	}
+	while (begin2 <= end2)
+	{
+		temp[index++] = a[begin2++];
+	}
+}
+
+void _MergeSort(int* a,int* temp,int left,int right)
+{
+	if(left < right)
+	{
+		int mid = (left + right)/2;
+		_MergeSort(a,temp,left,mid);
+		_MergeSort(a,temp,mid + 1,right);
+		_Merge(a,temp,left,mid,mid + 1,right);//借助temp进行排序
+		for(int i = left;i <= right;++i)
+		{
+			a[i] = temp[i];
+		}
+	}
+}
+
+void MergeSort(int* a,int size) //归并排序数组
+{
+	assert(a);
+	int* temp = new int[size];//开辟N个空间
+	int left = 0;
+	int right = size - 1;
+	_MergeSort(a,temp,left,right);
+	delete[] temp;
+}
+
+void TestMergeSort()
+{
+	int a[] = {2,9,1,4,7,8,0,3,6,5,45,12,32,17};
+	int size = sizeof(a)/sizeof(a[0]);
+	MergeSort(a,size);
+	Print(a,size);
+}
+
+//计数排序
+//需要统计次数，使用直接定址法，统计最大数和最小数，开辟两个数相差的
+//空间大小，对于重复数据，用count来计数，时间复杂度O（N + 范围个数）,
+//空间复杂度O（范围个数），计数排序适合于数据较为密集的情况，当数据集
+//没有重复的数据，可以直接使用位图，
+
+void CountSort(int* a,size_t size)
+{
+	assert(a);
+	int max = a[0];
+	int min = a[0];
+	int count = 0;
+
+	for(size_t i = 0;i < size;++i)//寻找数组中的最大数和最小数
+	{
+		if(a[i] < min)
+		{
+			min = a[i];
+		}
+		if(a[i] > max)
+		{
+			max = a[i];
+		}
+	}
+
+	//开辟存储空间，并初始化
+	int* temp = new int[max - min + 1];
+	memset(temp,0,sizeof(int)*(max - min + 1));
+	for(size_t i = 0;i < max - min + 1;++i)//直接选址法
+	{
+		int num = a[i] - min;
+		temp[num]++;
+	}
+
+	for(size_t i = 0;i < size;)//将排序好的顺序写入a数组中
+	{
+		for(size_t j = 0;j < max - min + 1;++j)
+		{
+			count = temp[j];
+			while (count--)
+			{
+				a[i] = j + min;
+				i++;
+			}
+		}
+	}
+	delete[] temp; 
+}
+
+void TestCountSort()
+{
+	int a[] = {2,9,1,4,7,8,0,3,6,5};
+	int size = sizeof(a)/sizeof(a[0]);
+	CountSort(a,size);
+	Print(a,size);
+}
+
+//基数排序
+//开辟两个数组count和start，count用来统计个位上分别为0-9的数据个数，start用来统计数据的开始位置（起始位置为0，下一位的数据开始的位置=上一个数据的开始位置+上一位总的数据个数），令开辟size大小的空间来存储每次排序，下面是低位基数排序，从个位开始排序，然后排序十位，进而百位，直至排到最大数据的最高位，排序结束。
+
+int GetMaxRadix(int* a,size_t size)//寻找最大数的位数
+{
+	int index = 1;//数据最小有一位
+	int max = 10;
+	for(size_t i = 0;i < size;++i)
+	{
+		while (a[i] >= max)//数据大于一位
+		{
+			index++;
+			max = max * 10;
+		}
+	}
+	return index;
+}
+
+void LSDSort(int* a,size_t size)
+{
+	assert(a);
+	int index = GetMaxRadix(a,size);//求最大数据的位数
+	int count[10] = { 0 };//记录数据出现的次数
+	int start[10] = { 0 };//记录数据的起始位置
+	int radex = 1;
+	int* bucket = new int[size];
+
+	for(int k = 1;k <= index;++k)//从个位到最高位进行排序
+	{
+		memset(count,0,sizeof(int)*10);//每次排序前需要把count置0
+		//计数（个位分别为0-9的数据个数）
+		for(size_t i = 0;i < size;++i)
+		{
+			int num = (a[i] / radex) % 10;//取个位
+			count[num]++;
+		}
+
+		//记录数据开始的位置
+		start[0] = 0;
+		int j = 1;
+		while (j < 10)
+		{
+			start[j] = start[j - 1] + count[j - 1];
+			j++;
+		}
+		for(size_t i = 0;i < size;++i)//将数据按顺序放入bucket中
+		{
+			int num = (a[i] / radex) % 10;
+			bucket[start[num]++] = a[i];
+		}
+		radex *= 10;
+		memcpy(a,bucket,sizeof(int)*size);
+	}
+	delete[] bucket;
+}
+
+void TestLSDSort()
+{
+	int a[] = {2,9,1,4,7,8,0,3,6,5};
+	int size = sizeof(a)/sizeof(a[0]);
+	LSDSort(a,size);
+	Print(a,size);
+}
