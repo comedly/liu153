@@ -342,17 +342,19 @@ protected:
 		}
 	}
 
-	void _MirrorRecursively(Node* root)//二叉树的镜像
+	void _MirrorRecursively(Node* root)
 	{
-		//判断根节点及左右子树是否为空
 		if(root == NULL || (root->_left == NULL && root->_right == NULL))
 			return;
-		Node* temp = root->_left;  //交换左右子节点
+		
+		//交换左右子结点
+		Node* temp = root->_left;
 		root->_left = root->_right;
 		root->_right = temp;
-		if(root->_left != NULL)
+
+		if(root->_left)
 			_MirrorRecursively(root->_left);
-		if(root->_right != NULL)
+		if(root->_right)
 			_MirrorRecursively(root->_right);
 	}
 
