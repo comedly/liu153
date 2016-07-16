@@ -144,7 +144,46 @@ public:
 		return size;
 	}
 
+	void FindPath(int expectedSum)
+	{
+		if(_root == NULL)
+			return;
+		vector<int> path;
+		int currentSum = 0;
+		_FindPath(_root,expectedSum,path,currentSum);
+	}
+
 protected:
+
+	void _FindPath(Node* root,int ecpectedSum,vector<int>& path,int& currentSum)
+	{
+		currentSum += root->_data;
+		path.push_back(root->_data);
+		//如果是叶节点，并且路劲上节点的和等于输入的值
+		//打印该路劲
+		bool IsLeaf = (root->_left == NULL) && (root->_right == NULL);
+		if(ecpectedSum == currentSum && IsLeaf)
+		{
+			cout<<"a path is found:";
+			vector<int>::iterator iter = path.begin();
+			for(;iter != path.end();++iter)
+			{
+				cout<<*iter<<" ";
+			}
+			cout<<endl;
+		}
+
+		//如果不是叶节点，则遍历它的子节点
+		if(root->_left != NULL)
+			_FindPath(root->_left,ecpectedSum,path,currentSum);
+		if(root->_right != NULL)
+			_FindPath(root->_right,ecpectedSum,path,currentSum);
+
+		//如果已经是叶节点了，但是不满足要求，该路径不等于输入的值，则需要回朔，即返回到父节点，切currentSum还必须减去当前节点的值
+		currentSum -= root->_data;
+		path.pop_back();
+	}
+
 	Node* _Find(Node* root,const T& x)
 	{
 		if(root == NULL)
@@ -165,6 +204,7 @@ protected:
 			return 1;
 		return _GetKLevel(root->_left,k-1) + _GetKLevel(root->_right,k-1);
 	}*/
+
 
 	void _GetKLevel(Node* root,size_t level,size_t k,size_t& size)
 	{
@@ -394,8 +434,8 @@ protected:
 		return DoseTree1HaveTree2(root1->_left,root2->_left) && DoseTree1HaveTree2(root1->_right,root2->_right);
 	}
 
-//protected:
-public:
+protected:
+//public:
 	Node* _root;//根节点
 };
 
@@ -438,15 +478,22 @@ void Test()
 	cout<<endl;
 }
 
-void HasSubTreeTest()
+//void HasSubTreeTest()
+//{
+//	int a1[10] = {1,2,3,'#','#',4,'#','#',5,6};
+//	int a2[15] = {1,2,'#',3,'#','#',4,5,'#',6,'#',7,'#','#',8,};
+//	int a3[5] = {2,3,'#','#',4};
+//
+//	BinaryTree<int> t1(a1,10,'#');
+//	BinaryTree<int> t2(a2,15,'#');
+//	BinaryTree<int> t3(a3,5,'#');
+//
+//	cout<<"t3是否为t1的子树:"<<t1.HasSubTree(t3._root)<<endl;
+//}
+
+void TestPath()
 {
-	int a1[10] = {1,2,3,'#','#',4,'#','#',5,6};
-	int a2[15] = {1,2,'#',3,'#','#',4,5,'#',6,'#',7,'#','#',8,};
-	int a3[5] = {2,3,'#','#',4};
-
-	BinaryTree<int> t1(a1,10,'#');
-	BinaryTree<int> t2(a2,15,'#');
-	BinaryTree<int> t3(a3,5,'#');
-
-	cout<<"t3是否为t1的子树:"<<t1.HasSubTree(t3._root)<<endl;
+	int a[] = {10,5,4,'#','#',7,'#','#',12};
+	BinaryTree<int> tree(a,sizeof(a)/sizeof(a[0]),'#');
+	tree.FindPath(22);
 }
