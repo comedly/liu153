@@ -182,6 +182,11 @@ public:
 		return _RemoveR(_root,key);
 	}
 
+	Node* Convert()
+	{
+		return _Convert(_root);
+	}
+
 	~BSTree()
 	{
 		_Destory(_root);
@@ -189,6 +194,37 @@ public:
 	}
 
 protected:
+
+	Node* _Convert(Node* root)
+	{
+		Node* pLastNodeInList = NULL;//指向双向链表的尾节点
+		ConvertNode(root,&pLastNodeInList);
+
+		Node* pHeadOfList = pLastNodeInList;//指向有序双向链表的尾节点
+		//需要向前回朔，指向头节点，返回头节点
+		while (pHeadOfList != NULL && pHeadOfList->_left != NULL)
+		{
+			pHeadOfList = pHeadOfList->_left;
+		}
+
+		return pHeadOfList;
+	}
+
+	void ConvertNode(Node* pNode,Node** pLastNodeInList)
+	{
+		if(pNode == NULL)
+			return;
+		Node* pCurrent = pNode;
+		if(pCurrent->_left != NULL)
+			ConvertNode(pCurrent->_left,pLastNodeInList);
+		pCurrent->_left = *pLastNodeInList;
+		if(*pLastNodeInList != NULL)
+			(*pLastNodeInList)->_right = pCurrent;
+
+		*pLastNodeInList = pCurrent;
+		if(pCurrent->_right != NULL)
+			ConvertNode(pCurrent->_right,pLastNodeInList);
+	}
 
 	void _Destory(Node* root)
 	{
@@ -288,8 +324,10 @@ void TESTBSTreeR()
 	{
 		tree.Insert(a[i],i);
 	}
-	tree.RemoveR(7);
-	tree.InOrder();
+	BSTreeNode<int,int>* NewNode = tree.Convert();
+	//tree.RemoveR(7);
+	//tree.InOrder();
+
 	/*tree.RemoveR(5);
 	tree.RemoveR(1);
 	tree.RemoveR(9);
