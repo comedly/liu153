@@ -125,10 +125,10 @@ public:
 			}
 			else
 			{
-				cout<<cur->_key<<":"<<cur->_value<<endl;
 				return cur;
 			}
 		}
+		return NULL;
 	}
 
 	void InOrder()
@@ -141,6 +141,7 @@ public:
 	{
 		return _IsBlance(_root);
 	}
+
 
 	~AVLTree()
 	{
@@ -206,12 +207,13 @@ protected:
 	void RotateLR(Node* parent)
 	{
 		Node* subL = parent->_left;
-		Node* subLR = subL->_right;
+		Node* subLR =subL->_right;
 		int bf = subLR->_bf;
+
 		RotateL(parent->_left);
 		RotateR(parent);
 
-		//根据subLR的平衡因子修正其他结点的平衡因子
+		//根据subL的平衡因子修正其他节点的平衡因子
 		if(bf == -1)
 		{
 			subL->_bf = 0;
@@ -222,6 +224,10 @@ protected:
 			subL->_bf = -1;
 			parent->_bf = 0;
 		}
+		else
+		{
+			subL->_bf = parent->_bf = 0;
+		}
 	}
 
 	void RotateRL(Node* parent)
@@ -231,6 +237,8 @@ protected:
 		int bf = subRL->_bf;
 		RotateR(parent->_right);
 		RotateL(parent);
+
+		//根据subRL的平衡因子修正其它节点的平衡因子
 		if(bf == 1)
 		{
 			subR->_bf = 0;
@@ -240,6 +248,10 @@ protected:
 		{
 			subR->_bf = 1;
 			parent->_bf = 0;
+		}
+		else
+		{
+			parent->_bf = subR->_bf = 0;
 		}
 	}
 
@@ -305,8 +317,7 @@ void AVLTreeTest()
 
 void TestTree_SP()
 {
-	//int a[] = {4, 2, 7, 1, 3, 6, 18, 9, 20, 16};
-	int a[] = {4,2,9,1,3,7,6,18,16,10};
+	int a[] = {4, 2, 6, 1, 3, 5, 15, 7, 16, 14};
 	AVLTree<int, int> t;
 
 	for (int i = 0; i < sizeof(a)/sizeof(a[0]); ++i)
