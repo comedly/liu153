@@ -181,7 +181,13 @@ public:
 	{
 		return _RemoveR(_root,key);
 	}
-
+	
+	//查找两个节点的最近公共祖先节点
+	Node* FindTwoLeastAncestor(const K& key1,const K& key2)
+	{
+		return _FindTwoLeastAncestor(_root,key1,key2);
+	}
+	
 	Node* Convert()
 	{
 		return _Convert(_root);
@@ -189,17 +195,36 @@ public:
 
 	~BSTree()
 	{
-		_Destory(_root);
-		_root = NULL;
+		/*_Destory(_root);
+		_root = NULL;*/
 	}
 
 protected:
+
+	Node* _FindTwoLeastAncestor(Node*& root,const K& key1,const K& key2)
+	{
+		if(root == NULL)
+			return NULL;
+		if((key1 < root->_key) && (key2 > root->_key))
+		{
+			cout<<root->_key<<endl;
+			return root;
+		}
+		if((key1 < root->_key) && (key2 < root->_key))
+		{
+			return _FindTwoLeastAncestor(root->_left,key1,key2);
+		}
+		if((key1 > root->_key)&&(key2 > root->_key))
+		{
+			return _FindTwoLeastAncestor(root->_right,key1,key2);
+		}
+		return NULL;
+	}
 
 	Node* _Convert(Node* root)
 	{
 		Node* pLastNodeInList = NULL;//指向双向链表的尾节点
 		ConvertNode(root,&pLastNodeInList);
-
 		Node* pHeadOfList = pLastNodeInList;//指向有序双向链表的尾节点
 		//需要向前回朔，指向头节点，返回头节点
 		while (pHeadOfList != NULL && pHeadOfList->_left != NULL)
@@ -226,14 +251,14 @@ protected:
 			ConvertNode(pCurrent->_right,pLastNodeInList);
 	}
 
-	void _Destory(Node* root)
+	/*void _Destory(Node* root)
 	{
 		if(root == NULL)
 			return ;
 		_Destory(root->_left);
 		_Destory(root->_right);
 		delete root;
-	}
+	}*/
 
 	void _InOrder(Node* root)
 	{
@@ -324,9 +349,11 @@ void TESTBSTreeR()
 	{
 		tree.Insert(a[i],i);
 	}
-	BSTreeNode<int,int>* NewNode = tree.Convert();
+	//BSTreeNode<int,int>* NewNode = tree.Convert();
 	//tree.RemoveR(7);
 	//tree.InOrder();
+
+	tree.FindTwoLeastAncestor(6,9);
 
 	/*tree.RemoveR(5);
 	tree.RemoveR(1);
