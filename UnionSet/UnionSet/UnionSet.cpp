@@ -19,12 +19,15 @@ public:
 		}
 	}
 
-	void Union(int root1,int root2)//结合两个根节点
+	void Union(int x1,int x2)//结合两个根节点
 	{
-		assert(_set[root1] < 0);
-		assert(_set[root2] < 0);
-		_set[root1] += _set[root2];
-		_set[root2] = root1;
+		int root1 = FindRoot(x1);
+		int root2 = FindRoot(x2);
+		if(root1 != root2)
+		{
+			_set[root1] += _set[root2];
+			_set[root2] = root1;
+		}
 	}
 
 	int FindRoot(int x)//查找一个节点的根节点
@@ -68,8 +71,8 @@ int Friends(int n,int m,int r[][2])//求朋友圈的个数
 
 int main()
 {
-	int r[][2] = {{1,2},{1,3},{4,5}};
-	int ret = Friends(5,3,r);
+	int r[][2] = {{1,2},{1,3},{1,5},{4,5}};
+	int ret = Friends(5,4,r);
 	cout<<"朋友圈的个数："<<ret<<endl;
 	system("pause");
 	return 0;
