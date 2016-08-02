@@ -1,7 +1,7 @@
 #pragma once
 
 #include<iostream>
-#include<iterator>
+#include<assert.h>
 using namespace std;
 
 //-------------------- 模拟实现简化版List迭代器 ---------------------------
@@ -115,7 +115,36 @@ public:
 		_head->_prev = _head;
 	}
 
-	void PushBack(const T& x)
+	//在pos位置前插入一个元素
+	void Insert(Iterator pos,const T& x)
+	{
+		ListNode* cur = pos._Node;
+		ListNode* prev = cur->_prev;
+
+		ListNode* newNode = new ListNode(x);
+		prev->_next = newNode;
+		newNode->_prev = prev;
+		
+		newNode->_next = cur;
+		cur->_prev = newNode;
+	}
+
+	//删除pos位置对应的元素，返回pos所指向元素的下一个位置
+	Iterator Erase(Iterator pos)
+	{
+		assert(pos != End());
+		ListNode* next = pos._Node->_next;
+		ListNode* prev = pos._Node->_prev;
+
+		prev->_next = next;
+		next->_prev = prev;
+
+		delete pos._Node;
+
+		return Iterator(next);
+	}
+
+	/*void PushBack(const T& x)
 	{
 		ListNode* tail = _head->_prev;
 		ListNode* newNode = new ListNode(x);
@@ -123,6 +152,26 @@ public:
 		newNode->_prev = tail;
 		_head->_prev = newNode;
 		newNode->_next = _head;
+	}*/
+
+	void PushFront(const T& x)
+	{
+		Insert(Begin(),x);
+	}
+
+	void PushBack(const T& x)
+	{
+		Insert(End(),x);
+	}
+
+	void PopBack()
+	{
+		Erase(--End());
+	}
+
+	void PopFront()
+	{
+		Erase(Begin());
 	}
 
 	Iterator Begin()
@@ -134,28 +183,44 @@ public:
 	{
 		return Iterator(_head);
 	}
+
+	constIterator Begin() const
+	{
+		return constIterator(_head->_next);
+	}
+
+	constIterator End() const
+	{
+		return _head;
+	}
+
 protected:
 	ListNode* _head;
 };
 
-void Print(const List<int>& list)
+void Print1(List<int>& list)
 {
-	/*List<int>::Iterator it = list.Begin();
+	List<int>::Iterator it = list.Begin();
 	while (it != list.End())
 	{
-		cout<<*it<<" ";
-		it++;
-	}*/
-
-	List<int>::constIterator it = list.Begin();
-	while (it != list.End())
-	{
+		//(*it)++;
 		cout<<*it<<" ";
 		it++;
 	}
 	cout<<endl;
 }
 
+void Print2(const List<int>& list)
+{
+	List<int>::constIterator it = list.Begin();
+	while (it != list.End())
+	{
+		//(*it)++;修改不了
+		cout<<*it<<" ";
+		it++;
+	}
+	cout<<endl;
+}
 
 void test()
 {
@@ -165,5 +230,13 @@ void test()
 	list.PushBack(3);
 	list.PushBack(4);
 	list.PushBack(5);
-	Print(list);
+	Print1(list);
+
+	list.PopBack();
+	list.PopBack();
+	Print2(list);
+
+	list.PopFront();
+	Print2(list);
+
 }
