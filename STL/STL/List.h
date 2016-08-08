@@ -2,6 +2,7 @@
 
 #include<iostream>
 #include<assert.h>
+#include"Iterator.h"
 using namespace std;
 
 //-------------------- 模拟实现简化版List迭代器 ---------------------------
@@ -29,10 +30,14 @@ template<class T, class Ref, class Ptr>
 struct __ListIterator {
   typedef __ListIterator<T, Ref, Ptr> Self;
 
+  typedef BidirectionalIteratorTag IteratorCagetory;
+  typedef ptrdiff_t DifferenceType;
   typedef T ValueType;
   typedef Ptr Pointer;
   typedef Ref Reference;
-  //typedef ptrdiff_t DifferenceType;
+ 
+  
+
   _ListNode<T>* _Node;
 
   __ListIterator(_ListNode<T>* x)
@@ -105,6 +110,7 @@ public:
 	typedef _ListNode<T> ListNode;
 	typedef __ListIterator<T,T&,T*> Iterator;
 	typedef __ListIterator<T,const T&,const T*> constIterator;
+	typedef ReverseIterator<Iterator> ReverseIterator;
 
 
 public:
@@ -184,6 +190,16 @@ public:
 		return Iterator(_head);
 	}
 
+	ReverseIterator RBegin()
+	{
+		return ReverseIterator(End());
+	}
+
+	ReverseIterator REnd()
+	{
+		return ReverseIterator(Begin());
+	}
+
 	constIterator Begin() const
 	{
 		return constIterator(_head->_next);
@@ -193,6 +209,8 @@ public:
 	{
 		return _head;
 	}
+
+
 
 protected:
 	ListNode* _head;
@@ -238,5 +256,4 @@ void test()
 
 	list.PopFront();
 	Print2(list);
-
 }
