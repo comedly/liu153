@@ -1,6 +1,7 @@
 #pragma once
 
 #include<iostream>
+#include"Iterator.h"
 using namespace std;
 
 template<class T>
@@ -10,6 +11,7 @@ public:
 	typedef T ValueType;
 	typedef ValueType* Iterator;
 	typedef const ValueType* ConstIterator;
+	typedef ReverseIterator<Iterator> ReverseIterator;
 
 	Vector()
 		:_start(0)
@@ -50,18 +52,39 @@ public:
 		return _finish;
 	}
 
-	void Insert(Iterator pos, const T& x)
+	void Insert(Iterator pos, const T& x)//在pos位置前插入一个元素
 	{
-		CheckStorage();
-		for(Iterator it = _finish;it != pos;it--)
+		if(pos == _EndOfStorage)
 		{
-
+			CheckStorage();
 		}
-		
-		for()
+		size_t size = pos-_start;
+		for(size_t i = Size();i>=size;i--)
+		{
+			_start[i+1] = _start[i];
+		}
+		*pos = x;
+		++_finish;
 	}
-	Iterator Erase(Iterator pos);
-	T& operator[](size_t index);// v[0] = 10;
+
+	Iterator Erase(Iterator pos)
+	{
+		if(pos+1 != _finish)
+		{
+			size_t size = pos - _start;
+			for(size_t i = size;i < Size();i++)
+			{
+				_start[i] = _start[i+1];
+			}
+			--_finish;
+		}
+		return pos;
+	}
+
+	T& operator[](size_t index)// v[0] = 10
+	{
+		return *(Begin()+index);
+	}
 
 protected:
 	void CheckStorage()
@@ -95,11 +118,16 @@ protected:
 
 void Print1(Vector<int>& vec)
 {
-	Vector<int>::Iterator it = vec.Begin();
-	while (it != vec.End())
+	//Vector<int>::Iterator it = vec.Begin();
+	//while (it != vec.End())
+	//{
+	//	//cout<<*it<<" ";
+	//	++it;
+	//}
+	size_t size = vec.Size();
+	for(size_t i = 0; i < size;i++)
 	{
-		cout<<*it<<" ";
-		++it;
+		cout<<vec[i]<<" ";
 	}
 	cout<<endl;
 }
@@ -123,7 +151,14 @@ void VectorTest()
 	vec.PushBack(3);
 	vec.PushBack(4);
 	vec.PushBack(5);
-
 	Print1(vec);
+
+	vec.Insert(vec.End(),7);
+	cout<<"vector distance:"<<Distance(vec.Begin(),vec.End())<<endl;
+
+	Vector<int>::Iterator it = vec.Begin();
+	Advance(it,3);
+	cout<<"vector Advance ? 3:  "<<*it<<endl;
+	
 	Print2(vec);
 }
