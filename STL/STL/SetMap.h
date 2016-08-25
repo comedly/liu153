@@ -6,6 +6,8 @@
 #include<iostream>
 using namespace std;
 
+
+//set 测试
 void SetTest()
 {
 	int i;
@@ -62,6 +64,7 @@ void SetTest()
 	//*it = 9;//error 
 }
 
+//map 测试
 void MapTest()
 {
 	map<string,int> mymap;//以string为键值，int为实值
