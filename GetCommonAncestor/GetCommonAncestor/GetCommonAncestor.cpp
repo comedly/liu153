@@ -104,6 +104,45 @@ int MaxLen(TreeNode* root)
 	return leftH > rightH ? leftH+1:rightH+1;
 }
 
+//3、将一个二叉搜索树转换为一个双向链表，要求不能创建新的结点
+//只能调整树中指针的指向
+
+void ConvertNode(TreeNode* pNode,TreeNode** pLastNodeInList)
+{
+	if(pNode == NULL)
+		return;
+
+	TreeNode *pCurrent = pNode;
+	if(pCurrent->_left != NULL)
+		ConvertNode(pCurrent->_left,pLastNodeInList);
+
+	pCurrent->_left = *pLastNodeInList;
+	if( *pLastNodeInList != NULL)
+		(*pLastNodeInList)->_right = pCurrent;
+
+	*pLastNodeInList = pCurrent;
+
+	if(pCurrent->_right != NULL)
+		ConvertNode(pCurrent->_right,pLastNodeInList);
+}
+
+TreeNode* Convert(TreeNode* root)
+{
+	TreeNode* pLastNodeInList = NULL;
+	ConvertNode(root,&pLastNodeInList);
+
+	//pLastNodeInList指向双向链表的尾结点
+	//我们需要返回头节点
+	TreeNode* pHeadOfList = pLastNodeInList;
+	while (pHeadOfList != NULL && pHeadOfList->_left != NULL)
+	{
+		pHeadOfList = pHeadOfList->_left;
+	}
+
+	return pHeadOfList;
+}
+
+
 int main()
 {
 	TreeNode* n1 = new TreeNode(1);
@@ -122,8 +161,16 @@ int main()
 	cout<<"n3和n4的公共祖先节点为:"<<GetLastCommonParent(n1,n3,n4)->data<<endl;
 
 	MaxLen(n1);
-	cout<<"此二叉树的距离为:"<<maxlen<<endl;
+	cout<<"此二叉树的距离为:"<<maxlen<<endl<<endl;
 
+	cout<<"二叉树转换为双向链表："<<endl;
+	TreeNode* head = Convert(n1);
+	while (head != NULL)
+	{
+		cout<<head->data<<" ";
+		head = head->_right;
+	}
+	cout<<endl;
 	system("pause");
 	return 0;
 }
