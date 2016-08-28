@@ -142,6 +142,64 @@ TreeNode* Convert(TreeNode* root)
 	return pHeadOfList;
 }
 
+//求二叉树的深度
+int TreeDepth(TreeNode *root)
+{
+	if(root == NULL)
+		return 0;
+	int nLeft = TreeDepth(root->_left);
+	int nRight = TreeDepth(root->_right);
+
+	return nLeft > nRight ? (nLeft + 1) : (nRight + 1);
+}
+
+//判断一个二叉树是不是平衡二叉树
+
+//方法1、利用求树的高度，遍历二叉树的每一个节点，调用TreeDepth的到他的左右子树的深度，如果左右子树深度只差不超过1.则是平衡二叉树
+//此种方法需要重复遍历多个结点
+bool IsBalance(TreeNode* root)
+{
+	if(root == NULL)
+		return true;
+
+	int nLeft = TreeDepth(root->_left);
+	int nRight = TreeDepth(root->_right);
+	int diff = nLeft - nRight;
+	if(diff > 1 || diff < -1)
+		return false;
+
+	return IsBalance(root->_left) && IsBalance(root->_right);
+}
+
+//方法2、后序遍历二叉树的每一个结点，在遍历到一个结点之前就已经遍历了他的左右子树。只要在遍历每一个结点的时候记录他的深度，就可以一边遍历一边判断每一个结点是不是平衡的。
+
+bool IsBalanced(TreeNode* root,int* depth)
+{
+	if(root == NULL)
+	{
+		*depth = 0;
+		return true;
+	}
+
+	int left ,right;
+	if(IsBalanced(root->_left,&left) && IsBalanced(root->_right,&right))
+	{
+		int diff = left - right;
+		if(diff >= -1 && diff <= 1)
+		{
+			*depth = 1 + (left > right ? left:right);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool IsBalanced(TreeNode* root)
+{
+	int depth = 0;
+	return IsBalanced(root,&depth);
+}
 
 int main()
 {
@@ -158,7 +216,7 @@ int main()
 	n2->_right = n4;
 	n5->_left = n6;
 
-	cout<<"n3和n4的公共祖先节点为:"<<GetLastCommonParent(n1,n3,n4)->data<<endl;
+	/*cout<<"n3和n4的公共祖先节点为:"<<GetLastCommonParent(n1,n3,n4)->data<<endl;
 
 	MaxLen(n1);
 	cout<<"此二叉树的距离为:"<<maxlen<<endl<<endl;
@@ -170,7 +228,12 @@ int main()
 		cout<<head->data<<" ";
 		head = head->_right;
 	}
-	cout<<endl;
+	cout<<endl;*/
+
+	cout<<TreeDepth(n1)<<endl;
+	cout<<IsBalance(n1)<<endl;
+	cout<<IsBalanced(n1)<<endl;
+
 	system("pause");
 	return 0;
 }
