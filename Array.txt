@@ -1,0 +1,110 @@
+
+#include<iostream>
+using namespace std;
+
+typedef int DateType;
+//数组
+class Array
+{
+public:
+	Array(int sz=10)
+		:parr(new DateType[sz])
+		,size(sz)
+	{
+		cout<<"Array(int  sz)"<<endl;
+	}
+
+	Array(const Array& arr)
+		:size(arr.size)
+	{
+		//有一块自己的空间
+		int i=0;
+		parr=new DateType[size];
+		//拷贝数据
+		//memcpy(parr,arr.parr,size);
+		for(i=0;i<size;i++)
+		{
+			parr[i]=arr.parr[i];
+		}
+	}
+
+	DateType& operator[](int index)
+	{
+		return parr[index];
+	}
+
+	Array operator=(const Array& arr)
+	{
+		size = arr.size;
+		parr = new DateType[size];	
+	}
+
+	~Array()
+	{
+		if(parr!=NULL)
+		{
+			delete[] parr;
+		}
+	}
+
+private:
+	DateType *parr;
+	int size;
+};
+
+//模拟实现String
+class String
+{
+public:
+	String(char *str="")
+		:_str(new char[strlen(str)+1])
+	{
+		strcpy(_str,str);
+	}
+
+	String(const String& str)
+	{
+		_str=new char[strlen(str._str)+1];
+		strcpy(_str,str._str);
+	}
+
+	String& operator=(const String& str)
+	{
+		if(this!=&str)//1，自赋值
+		{
+			delete[] _str;//2，释放原来空间
+			_str=new char[strlen(str._str)+1];
+			strcpy(_str,str._str);//3，开辟并复制
+		}
+		return *this;//4，返回*this
+	}
+	
+	~String()
+	{
+		delete[]  _str;
+	}
+private:
+	char *_str;
+};
+int main()
+{	
+	//String str1("String");
+	//String str2(str1);
+	//String str3;
+	//str3=str2;
+	//Array arr(10);
+	arr[2] = 10;
+	arr[1] = 100;
+	for(int i = 0; i < 5; i++)
+	{
+		arr[i] = i;
+	}
+	Array arr2(arr);
+	for(int i = 0; i < 5; i++)
+	{
+		cout<<arr2[i]<<endl;
+	}
+	Array arr3 = arr2;
+	getchar();
+	return 0;
+}
