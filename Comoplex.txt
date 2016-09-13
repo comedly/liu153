@@ -1,0 +1,277 @@
+﻿/***********************
+***利用c++实现复数******
+****LL******************
+*****2016-3************/
+
+class Comoplex
+
+{
+
+public:
+	
+Comoplex(int real, int image)
+	
+{
+		
+_real = real;
+		
+_image = image;
+	
+}
+	
+//拷贝构造
+	
+//析构
+
+//赋值运算符的重载
+	
+bool operator==(Comoplex &c);
+	
+bool operator!=(Comoplex &c);
+	
+bool operator>(Comoplex &c);
+	
+bool operator>=(Comoplex &c);
+	
+bool operator<(Comoplex &c);
+	
+bool operator<=(Comoplex &c);
+
+	
+Comoplex operator+(Comoplex &c);
+	
+Comoplex operator+=(Comoplex &c);
+
+	
+Comoplex operator-(Comoplex &c);
+	
+Comoplex operator-=(Comoplex &c);
+
+	
+Comoplex operator*(Comoplex &c);
+	
+Comoplex operator*=(Comoplex &c);
+
+	
+Comoplex operator/(Comoplex &c);
+	
+Comoplex operator/=(Comoplex &c);
+
+	
+Comoplex operator++();//前置++
+	
+Comoplex operator++(int);//后置++
+	
+Comoplex operator--();//前置--
+	
+Comoplex operator--(int);//后置--
+
+
+private:
+	
+int _real;
+	
+int _image;
+
+};
+
+//
+#include<iostream>
+using namespace std;
+
+class Comoplex
+{
+public:
+	Comoplex(int real, int imag)
+		:_real(real)
+		,_image(imag)
+{	}
+	Comoplex()
+	{
+		_real=0;
+		_image=0;
+	}
+	ostream& operator<<(ostream& os);
+	istream& operator>>(istream& is);
+	void Display();
+	Comoplex(const Comoplex &c);//拷贝构造 
+Comoplex& operator=(Comoplex &c);//赋值运算符的重载
+bool operator==(Comoplex &c);
+bool operator!=(Comoplex &c);
+bool operator>(Comoplex &c);
+bool operator>=(Comoplex &c);
+bool operator<(Comoplex &c);
+bool operator<=(Comoplex &c);
+Comoplex operator+(Comoplex &c);
+Comoplex operator+=(Comoplex &c);
+Comoplex operator-(Comoplex &c);
+Comoplex operator-=(Comoplex &c);
+Comoplex operator*(Comoplex &c);
+Comoplex operator*=(Comoplex &c);
+Comoplex operator/(Comoplex &c);
+Comoplex operator/=(Comoplex &c);
+Comoplex operator++();//前置++
+Comoplex operator++(int);//后置++
+Comoplex operator--();//前置--
+Comoplex operator--(int);//后置--
+private:
+	int _real;
+	int _image;
+};
+
+ostream& Comoplex::operator<<(ostream& os)
+{
+	os<<this->_real<<"+"<<this->_image<<"i"<<endl;
+	return os;
+}
+
+istream& Comoplex::operator>>(istream& is)
+{
+	is>>this->_real>>this->_image;
+	return is;
+}
+
+Comoplex ::Comoplex(const Comoplex &c)//拷贝构造函数
+{
+	_real=c._real;
+	_image=c._image;
+}
+
+Comoplex& Comoplex::operator=(Comoplex &c)//赋值运算符的重载
+{
+	if(this!=&c)
+	{
+		_real=c._real;
+		_image=c._image;
+	}
+	return *this;
+}
+
+bool Comoplex::operator==(Comoplex &c1)
+{
+	return (_real==c1._real) && (_image==c1._image);
+}
+
+bool Comoplex::operator!=(Comoplex &c)
+{
+	return !(*this==c);
+}
+
+Comoplex Comoplex::operator+(Comoplex &c1)//复数相加
+{
+	Comoplex c;
+	c._real=_real+c1._real;
+	c._image=_image+c1._image;
+	return c;
+}
+
+Comoplex Comoplex::operator+=(Comoplex &c)
+{
+	_real+=c._real;
+	_image+=c._image;
+	return *this;
+}
+
+Comoplex Comoplex::operator-(Comoplex &c1)//复数相减
+{
+	Comoplex c;
+	c._real=_real-c1._real;
+	c._image=_image-c1._image;
+	return c;
+}
+
+Comoplex Comoplex::operator-=(Comoplex &c)
+{
+	_real-=c._real;
+	_image-=c._image;
+	return *this;
+}
+
+Comoplex Comoplex::operator*(Comoplex &c1)
+{
+	Comoplex c;
+	c._real=_real*c1._real-_image*c1._image;
+	c._image=_real*c1._image+c1._real*_image;
+	return c;
+}
+
+Comoplex Comoplex::operator*=(Comoplex &c)
+{
+	_real*=c._real;
+	_image*=c._image;
+	return *this;
+}
+Comoplex Comoplex::operator/(Comoplex &c1)
+{
+	Comoplex c;
+	c._real=(_real*c1._real+_image*c1._image)/(c1._real*c1._real+c1._image*c1._image);
+	c._image=(_real*c1._image+_image*c1._real)/(c1._real*c1._real+c1._image*c1._image);
+	return c;
+}
+
+Comoplex Comoplex::operator/=(Comoplex &c1)
+{
+	this->_real=(_real*c1._real+_image*c1._image)/(c1._real*c1._real+c1._image*c1._image);
+	this->_image=(_real*c1._image+_image*c1._real)/(c1._real*c1._real+c1._image*c1._image);
+	return *this;
+}
+
+void Comoplex::Display()//打印出复数
+{
+	cout<<_real;
+	if(_image>0)
+	{
+		cout<<"+"<<_image<<"i"<<endl;
+	}
+	else
+	{
+		cout<<_image<<"i"<<endl;
+	}
+}
+
+Comoplex Comoplex::operator++()//前置++
+{
+	this->_real++;
+	this->_image++;
+	return *this;
+}
+
+Comoplex Comoplex::operator++(int)//后置++
+{
+	Comoplex tmp(*this);
+	this->_real++;
+	this->_image++;
+	return tmp;
+}
+
+Comoplex Comoplex::operator--()
+{
+	this->_real--;
+	this->_image--;
+	return *this;
+}
+
+Comoplex Comoplex::operator--(int)
+{
+	Comoplex tmp(*this);
+	this->_real--;
+	this->_image--;
+	return tmp;
+}
+
+int main()
+{
+	Comoplex c1,c2,c3,c4;
+	c1>>cin;
+	c1<<cout;
+	c2>>cin;
+	c2<<cout;
+	c3=c1+c2;
+	c4=c1*c2;
+	c1+=c1;
+	c3.Display();
+	c4.Display();
+	c1.Display();
+	system("pause");
+	return 0;
+}
