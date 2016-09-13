@@ -1,0 +1,255 @@
+使用C++完成一个【日期类】的编写。可以实现。
+   1>日期+-天数-----输出日期 
+   2>日期-日期------输出天数
+
+
+#include<iostream>
+using namespace std; 
+
+int _MONTH[]={{31},{28},{31},{30},{31},{30},{31},{31},{30},{31},{30},{31}};
+
+class Date
+{
+public: 
+	Date(int year=1994, int month=2, int day=11)
+		:_year(year)
+		,_month(month)
+		,_day(day)
+	{  } 
+	bool IsLeapYear(int year); //判断是否为闰年
+	long GetDays();//计算天数
+	long operator-(Date date);//求取两日期相差的天数 
+	Date operator++();//日期加1，返回新日期
+	Date operator--();//日期减1，返回新日期
+	Date &operator+=(int days);//日期加上天数，返回新日期
+	Date &operator-=(int days);//日期减上天数，返回新日期
+	void Show();//打印日期
+	Date();
+private: 
+	int _year; 
+	int _month; 
+	int _day;
+};
+
+Date::Date()
+{
+	this->_year=1994;
+	this->_month=2;
+	this->_day=11;
+}
+
+Date Date::operator++()//日期加1，返回新日期
+{
+	//如果月份为12，且天数为31，所以要调整年，月，日
+	if(this->_month==12 && this->_day>=31)
+	{
+		++_year;
+		this->_month=_day=1;
+	}
+	else if(this->_day==_MONTH[this->_month-1])
+	{
+		//说明改日为本月最后一天
+		++_month;
+		this->_day=1;
+	}
+	else ++_day;
+	return *this;
+}
+
+Date Date::operator--()//日期减1，返回新日期
+{
+	//如果月份和天数为1，调整年，月，日
+	if(this->_month==1 && this->_day==1)
+	{
+		--_year;
+		this->_month=12;
+		this->_day=31;
+	}
+	else if(this->_day==1)
+	{
+		//说明改天是本月第1天
+		--_month;
+		this->_day=_MONTH[_month-1];
+	}
+	else --_day;
+	return *this;
+}
+
+Date & Date::operator+=(int days)//日期加上天数，返回新日期
+{
+	int i=0;
+	for(i=days;i>=1;i--)
+	{
+		operator++();
+	}
+	/*if(this->_month==12 && this->_day>=31)
+	{
+		_year++;
+		this->_month=this->_day=1;
+	}
+	else
+		if(this->_day==_MONTH[this->_month-1])
+	{
+		_month++;
+		this->_day=1;
+	}
+		else _day+days;*/
+		return *this;
+}
+
+Date & Date::operator-=(int days)//日期减上天数，返回新日期
+{
+	int i;
+	for(i=days;i>=1;i--)
+	{
+		operator--();
+	}
+	return *this;
+}
+
+void Date::Show()
+{ 
+	cout<<this->_year<<"-"<<this->_month<<"-"<<this->_day<<endl;
+}
+
+bool Date::IsLeapYear(int year)//判断是否为闰年
+{
+	if(0 == year%400 || (0!=year%100 && 0==year%4)) 
+	{
+		_MONTH[1]=29;
+		return true;
+	}
+	else  
+		return false;
+}
+
+long Date::GetDays()//计算天数
+{ 
+	long ret = 0;
+	int i; 
+	for(i=0; i<_year; i++) 
+	{  
+		if(IsLeapYear(i))   
+			ret += 366;  
+		else   
+			ret += 365;
+	} 
+	switch(_month) 
+	{ 
+	case 2:  
+		{   
+			ret += 31;    
+			break;   
+		} 
+	case 3:  
+		{  
+			ret += (31+IsLeapYear(_year)?29:28);  
+			break; 
+		}
+	case 4:  
+		{   
+			ret += (31+(IsLeapYear(_year)?29:28)+31);   
+			break;  
+		}
+	case 5:  
+		{  
+			ret += (31+(IsLeapYear(_year)?29:28)+31+30); 
+			break;  
+		}
+	case 6: 
+		{   
+			ret += (31+(IsLeapYear(_year)?29:28)+31+30+31); 
+			break;  
+		} 
+	case 7: 
+		{  
+			ret += (31+(IsLeapYear(_year)?29:28)+31+30+31+30);  
+			break;  
+		}
+	case 8: 
+		{  
+			ret += (31+(IsLeapYear(_year)?29:28)+31+30+31+30+31);  
+			break; 
+		} 
+	case 9:  
+		{  
+			ret += (31+(IsLeapYear(_year)?29:28)+31+30+31+30+31+31); 
+			break; 
+		}
+	case 10: 
+		{  
+			ret += (31+(IsLeapYear(_year)?29:28)+31+30+31+30+31+31+30);  
+			break; 
+		} 
+	case 11:  
+		{   
+			ret += (31+(IsLeapYear(_year)?29:28)+31+30+31+30+31+31+30+31);
+			break;
+		}
+	case 12:  
+		{  
+			ret += (31+(IsLeapYear(_year)?29:28)+31+30+31+30+31+31+30+31+30); 
+			break;
+		} 
+	default: 
+		break;
+	} 
+	ret += _day;
+	return ret;
+}
+
+long Date::operator-(Date date)//求取两日期相差的天数
+{ 
+	long ret = GetDays()-date.GetDays(); 
+	if(0 > ret) 
+		ret = -ret;
+	else
+		return ret;
+}
+
+void test1()//测试两日期之间的天数
+{
+	int year1,month1,day1;
+	int year2,month2,day2;
+	cin>>year1>>month1>>day1;
+	Date date1(year1,month1 ,day1 );
+	cin>>year2>>month2>>day2;
+	Date date2(year2,month2 ,day2 );
+	long ret = date1-date2; 
+	cout<<year1<<"-"<<month1<<"-"<<day1<<"和"<<
+		year2<<"-"<<month2<<"-"<<day2<<"之间相差";
+	cout<<ret<<"day"<<endl;
+}
+
+void test2()//测试日期加天数，返回新日期
+{
+	int year,month,day,days;
+	cin>>year>>month>>day;
+	Date d1(year,month,day);
+	d1.IsLeapYear(year);
+	cin>>days;
+	cout<<"执行Date+=后:";
+	d1.operator+=(days);
+	d1.Show();
+}
+
+void test3()//测试日期减天数，返回新日期
+{
+	int year,month,day,days;
+	cin>>year>>month>>day;
+	Date d1(year,month,day);
+	d1.IsLeapYear(year);
+	cin>>days;
+	cout<<"执行Date-=后:";
+	d1.operator-=(days);
+	d1.Show();
+}
+
+int main()
+{ 
+	//test1();//测试两日期之间的天数
+	//test2();//测试日期加天数，返回新日期
+	test3();//测试日期减天数，返回新日期
+	system("pause");
+	return 0;
+}
