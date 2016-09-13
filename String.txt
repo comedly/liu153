@@ -1,0 +1,106 @@
+/***********************
+**********ÊµÏÖStringÀà**
+***********************/
+
+#include<iostream>
+#include<cassert>
+using namespace std;
+
+class String
+{
+public:
+	String()
+	{
+		_str=new char[1];
+		*_str='\0';
+	}
+
+	String(char *str)
+		:_str(new char[strlen(str)+1])
+	{
+		strcpy(_str,str);
+	}
+
+	String(const String& str)
+		:_str(NULL)
+	{
+		String tmp(str._str);
+		swap(_str,tmp._str);
+	}
+
+	/*String& operator=(const String str)
+	{
+		swap(_str,str._str);
+		return *this;
+	}*/
+
+	String& operator=(const String &str)
+	{
+		if(this!=&str)
+		{
+			String tmp(str);
+			swap(_str,tmp._str);
+		}
+		return *this;
+	}
+
+	bool operator==(const String &s)
+	{
+		if ( strlen(s._str) != strlen(_str))
+			return false;
+		return Compare(_str,s._str)?false:true;
+	}
+
+	bool Compare(const char* str1,const char* str2)
+	{
+		assert(str1);
+		assert(str2);
+		int ret;
+		while(*str1++ == *str2++)
+		{
+			ret=*str1 - *str2;
+			if(ret>0)
+				return true;
+			else
+				return false;
+		}
+	}
+
+	bool operator>(const String &s)
+	{
+		if(Compare(_str,s._str))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	bool operator<(const String &s)
+	{
+		return (_str > s._str)?true:false ;
+	}
+
+	~String()
+	{
+		if(_str!=NULL)
+			delete[] _str;
+	}
+
+private:
+	char *_str;
+};
+
+int main()
+{
+	int ret=0;
+	int count=0;
+	
+	String str1("String");
+	String str2(str1);
+	String str3;
+	str3=str2;
+	return (ret=(str1==str2))?true:false;
+}
